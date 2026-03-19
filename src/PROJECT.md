@@ -29,13 +29,3 @@ Division scoped to monomial divisor in version one
 No equation solving — input is always an expression, not an equation
 
 
-```rs
-if term.exp == 0 {
-            print!("{}", term.coeff.abs());
-        } else if term.exp == 1 {
-            print!("{}x", term.coeff.abs());
-        } else {
-            print!("{}x^{}", term.coeff.abs(), term.exp);
-        }
-
-```

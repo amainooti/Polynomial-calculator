@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 use std::fmt;
+use std::ops::Add;
 
+#[derive(Clone)]
 struct Term {
     deg: u32,
     coeff: i64,
@@ -48,6 +50,25 @@ impl fmt::Display for Poly {
     }
 }
 
+impl Add for &Poly {
+    // Function: implements addition of two polynomials. 
+    // that returns a new Poly that is the sum of the two polynomials.
+
+    type Output = Poly;
+    
+    fn add(self, other: Self) -> Poly {
+        // Combine terms from both polynomials
+        let mut combined_terms = self.terms.clone(); // this is a vector of terms from the first polynomial
+
+        combined_terms.extend(other.terms.iter().cloned()); // this adds the terms from the second polynomial to the combined_terms vector
+        // Create a new polynomial with the combined terms
+        let combined_poly = Poly { terms: combined_terms };
+        // Simplify the combined polynomial to combine like terms
+        simplify(&combined_poly)
+        
+    }
+}
+
 // TODO: create a simplify function that takes a Poly and returns a new 
 // Poly in canonical form. Canonical means: 
 // like terms are combined, terms with a zero coefficient are removed, 
@@ -89,8 +110,10 @@ fn main() {
         ],
     };
 
-    let simplified = simplify(&poly);
-
+    let simplified = simplify(&poly); 
+    // @note simplified returns Poly which does not implement the Clone trait, so we cannot use simplified.clone() here.
+    let sum = &simplified + &simplified; 
     println!("Original: {}", poly);
     println!("Simplified: {}", simplified);
+    println!("Sum: {}", sum);
 }

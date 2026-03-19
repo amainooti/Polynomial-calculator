@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::fmt;
 use std::ops::Add;
+use std::ops::Sub;
 
 #[derive(Clone)]
 struct Term {
@@ -15,6 +16,9 @@ struct Poly {
 impl fmt::Display for Poly {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut first = true;
+        if self.terms.is_empty() {
+                write!(f, "0")?;
+            }
 
         for term in &self.terms {
             let abs_coeff = term.coeff.abs();
@@ -43,6 +47,7 @@ impl fmt::Display for Poly {
                 write!(f, "x^{}", term.deg)?;
             }
 
+
             first = false;
         }
 
@@ -58,7 +63,7 @@ impl Add for &Poly {
     
     fn add(self, other: Self) -> Poly {
         // Combine terms from both polynomials
-        let mut combined_terms = self.terms.clone(); // this is a vector of terms from the first polynomial
+        let mut combined_terms: Vec<Term> = self.terms.iter().cloned().collect(); // this is a vector of terms from the first polynomial
 
         combined_terms.extend(other.terms.iter().cloned()); // this adds the terms from the second polynomial to the combined_terms vector
         // Create a new polynomial with the combined terms
@@ -66,6 +71,18 @@ impl Add for &Poly {
         // Simplify the combined polynomial to combine like terms
         simplify(&combined_poly)
         
+    }
+}
+
+
+impl Sub for &Poly {
+    type Output = Poly;
+
+    fn sub(self, other: Self) -> Poly {
+        // Negate the second polynomial's coefficients and add
+        let negated_other_terms: Vec<Term> = other.terms.iter().map(|t| Term { deg: t.deg, coeff: -t.coeff }).collect();
+        let negated_other_poly = Poly { terms: negated_other_terms };
+        self + &negated_other_poly
     }
 }
 
@@ -111,9 +128,11 @@ fn main() {
     };
 
     let simplified = simplify(&poly); 
-    // @note simplified returns Poly which does not implement the Clone trait, so we cannot use simplified.clone() here.
+    // Sum is the result of adding the simplified polynomial to itself.
     let sum = &simplified + &simplified; 
+    let sub = &simplified - &simplified; // this should yield the zero polynomial
     println!("Original: {}", poly);
     println!("Simplified: {}", simplified);
     println!("Sum: {}", sum);
+    println!("Sub: {}", sub);
 }
